@@ -1,0 +1,184 @@
+#!/bin/bash
+# GitHub.com/PiercingXX
+
+username=$(id -un)
+
+# shellcheck source=service-manager.sh
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/service-manager.sh"
+
+# Apps to Install
+    paru -S fwupd --noconfirm
+    paru -S w3m --noconfirm
+    paru -Rs firefox --noconfirm
+    paru -S rofi --noconfirm
+    paru -S kitty --noconfirm
+    paru -S python --noconfirm
+    paru -S npm --noconfirm
+    paru -S ulauncher --noconfirm
+    paru -S vlc --noconfirm
+    paru -S ventoy-bin --noconfirm
+    paru -S proton-vpn-gtk-app --noconfirm
+    flatpak install flathub net.waterfox.waterfox -y
+    flatpak install flathub md.obsidian.Obsidian -y
+    flatpak install flathub org.libreoffice.LibreOffice -y
+    flatpak install flathub org.blender.Blender -y
+    flatpak install flathub org.qbittorrent.qBittorrent -y
+    flatpak install flathub io.missioncenter.MissionCenter -y
+    flatpak install flathub io.github.shiftey.Desktop -y #Github Desktop
+    flatpak install flathub com.flashforge.FlashPrint -y
+    flatpak install flathub com.nextcloud.desktopclient.nextcloud -y
+    flatpak install flathub com.github.xournalpp.xournalpp -y # For PDF annotation
+
+# SSH & Firewall - for arch systems
+    sudo pacman -S openssh --noconfirm
+    if ! enable_and_start_service sshd; then
+        echo "Warning: Could not start/enable SSH service on this init system."
+    fi
+    paru -S ufw --noconfirm
+    sudo ufw enable
+    sudo ufw allow SSH
+
+# Apps to uninstall
+    sudo pacman -Rs gnome-console --noconfirm
+    sudo pacman -Rs firefox --noconfirm
+    sudo pacman -Rs epiphany --noconfirm
+    sudo pacman -Rs gnome-terminal --noconfirm
+    sudo pacman -Rs gnome-software --noconfirm
+    sudo pacman -Rs software-center --noconfirm
+    sudo pacman -Rs dolphin --noconfirm
+    sudo pacman -Rs gnome-maps --noconfirm
+    sudo pacman -Rs gnome-photos --noconfirm
+    sudo pacman -Rs gnome-calendar --noconfirm
+    sudo pacman -Rs gnome-contacts --noconfirm
+    sudo pacman -Rs gnome-music --noconfirm
+    sudo pacman -Rs gnome-text-editor --noconfirm
+    sudo pacman -Rs gnome-weather --noconfirm
+
+# Theme stuffs
+    paru -S papirus-icon-theme-git --noconfirm
+
+# Gimp
+    flatpak install flathub org.gimp.GIMP -y
+    flatpak install flathub org.darktable.Darktable -y
+    paru -S opencl-amd --noconfirm
+
+# Synology
+    paru -S synochat --noconfirm
+    paru -S synology-drive --noconfirm
+    #flatpak install flathub com.synology.synology-note-station -y
+
+# Yazi
+    paru -S yazi-nightly-bin --noconfirm
+    paru -S ffmpeg --noconfirm
+    paru -S 7zip --noconfirm
+    paru -S jq --noconfirm
+    paru -S poppler --noconfirm
+    paru -S fd --noconfirm
+    paru -S ripgrep --noconfirm
+    paru -S fzf --noconfirm
+    paru -S zoxide --noconfirm
+    paru -S resvg --noconfirm
+    paru -S imagemagick --noconfirm
+    ya pkg add dedukun/bookmarks
+    ya pkg add yazi-rs/plugins:mount
+    ya pkg add dedukun/relative-motions
+    ya pkg add yazi-rs/plugins:chmod
+    ya pkg add yazi-rs/plugins:smart-enter
+    ya pkg add AnirudhG07/rich-preview
+    ya pkg add Rolv-Apneseth/starship
+    ya pkg add yazi-rs/plugins:full-border
+    ya pkg add uhs-robert/recycle-bin
+    ya pkg add yazi-rs/plugins:diff
+
+# Nvim & Depends
+    echo "Installing Neovim dependencies..."
+    sudo pacman -S nodejs npm --noconfirm
+    sudo pacman -S ripgrep --noconfirm
+    paru -S lua51 --noconfirm
+    sudo pacman -S python --noconfirm
+    sudo pacman -S python-pip --noconfirm
+    paru -S python-pynvim --noconfirm || python3 -m pip install --user pynvim
+    python3 -m pip install --user --upgrade pynvim 2>/dev/null || true
+    sudo pacman -S chafa --noconfirm
+
+    echo "Installing Neovim Nightly (required): neovim-nightly-bin"
+    sudo pacman -Rs neovim --noconfirm 2>/dev/null || true
+
+    if ! paru -S neovim-nightly-bin --noconfirm; then
+        echo "⚠ WARNING: neovim-nightly-bin failed to install"
+    fi
+
+    if command -v nvim &> /dev/null; then
+        echo "✓ Neovim verified: $(nvim --version | head -n1)"
+    else
+        echo "⚠ WARNING: Neovim is not installed"
+    fi
+
+# Opencode
+    paru -S opencode-desktop-bin --noconfirm
+
+# VScode
+    paru -S visual-studio-code-bin --noconfirm
+
+
+# Kdenlive
+#    flatpak install flathub org.kde.kdenlive -y
+
+# Vial
+    paru -S vial-appimage --noconfirm
+    # Allows user to access keyboard 
+    sudo usermod -aG uucp $USER
+
+# Steam and Gaming
+    sudo pacman -S steam --noconfirm
+    # Steam Needs Vulkan and 32-bit libs for Proton games
+        sudo pacman -S vulkan-tools --noconfirm
+        sudo pacman -S vulkan-icd-loader --noconfirm
+        sudo pacman -S lib32-vulkan-icd-loader --noconfirm
+        sudo pacman -S mesa lib32-mesa --noconfirm
+        sudo pacman -S mesa-demos --noconfirm
+        sudo pacman -S vulkan-radeon lib32-vulkan-radeon --noconfirm 
+        sudo pacman -S lib32-gcc-libs --noconfirm 
+        sudo pacman -S lib32-glibc --noconfirm 
+        sudo pacman -S lib32-libdrm --noconfirm 
+        sudo pacman -S lib32-libx11 --noconfirm 
+        sudo pacman -S lib32-libxext --noconfirm 
+        sudo pacman -S lib32-libxcomposite --noconfirm 
+        sudo pacman -S lib32-libxrender --noconfirm 
+        sudo pacman -S lib32-libxfixes --noconfirm 
+        sudo pacman -S lib32-libxrandr --noconfirm 
+        sudo pacman -S lib32-libxtst --noconfirm 
+        sudo pacman -S lib32-libpulse --noconfirm
+        sudo pacman -S lib32-openssl --noconfirm
+        sudo pacman -S lib32-sdl2 --noconfirm 
+    # If NVIDIA proprietary driver is present, install its 32-bit runtime pieces
+        if lspci -nn | grep -qi 'NVIDIA'; then
+            echo "[*] NVIDIA GPU detected; installing NVIDIA Vulkan runtime components..."
+            sudo pacman -S --needed --noconfirm nvidia nvidia-utils lib32-nvidia-utils
+        fi
+    flatpak install flathub com.discordapp.Discord -y
+
+# Tailscale
+    paru -S tailscale --noconfirm
+    curl -fsSL https://tailscale.com/install.sh | sh
+    wait
+
+# Docker
+    paru -S docker docker-compose --noconfirm
+    if ! enable_and_start_service docker; then
+        echo "Warning: Could not start/enable Docker service on this init system."
+    fi
+    sudo usermod -aG docker $username
+
+# ClamAV
+    paru -S clamav --noconfirm
+    if ! enable_and_start_service freshclam clamav-freshclam; then
+        echo "Warning: Could not start/enable freshclam service on this init system."
+    fi
+    if ! enable_and_start_service clamd clamav-daemon; then
+        echo "Warning: Could not start/enable ClamAV daemon on this init system."
+    fi
+    sudo freshclam
+
+# OpenWebUi
+#    docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
